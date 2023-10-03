@@ -1,113 +1,209 @@
-import Image from 'next/image'
+'use client'
+import React, { useEffect, useState } from 'react';
+import {AiOutlineEdit,AiOutlineDelete} from 'react-icons/ai'
+import {IoCloseSharp} from 'react-icons/io5'
 
-export default function Home() {
+
+const page = () => {
+
+
+
+const [Modal, setModal] = useState(false);
+const [Modal2, setModal2] = useState(false);
+const [Er ,SetEr] = useState('');
+const [Inn ,SetInn] = useState(-1)
+
+const [Add, setAdd] = useState({uname:'',uage:''});
+const [Edit, setEdit] = useState({uname:'',uage:''});
+  
+const [Data,setData] = useState ([
+  {id:1, name:'christy', age:20},
+  {id:2,name:'kevin',age:10 },
+  {id:3,name:'jovan',age:16},
+  { id:4, name:'hannah',age:5}
+])
+
+useEffect(() => {
+  console.log(Data)
+  console.log('err',Er)
+  },[Data,Er]
+)
+
+const achange =(e)=>{
+  setAdd({
+    ...Add,
+    [e.target.name]:e.target.value,
+
+  })
+}
+
+const echange =(e)=>{
+  setEdit({
+    ...Edit,
+    [e.target.name]:e.target.value,
+
+  })
+}
+
+const Editsubmit = ()=>{
+  console.log('hello')
+
+  if (Edit.uname==''||Edit.uage=='') {
+    SetEr('Fields cannot be empty');
+  } 
+  else if (isNaN(Edit.uage)) {
+    SetEr('Age must be a number');
+  } 
+  else{
+    if (Inn !== -1) {
+      const updatedData = [...Data];
+      updatedData[Inn] = {
+        name: Edit.uname,
+        age: Edit.uage,
+      };
+      setData(updatedData);
+  
+      setEdit({uname: '',uage: '',});
+      setModal(!Modal);
+    }
+  }
+}
+
+const handleSubmit= (e) => {
+  
+  e.preventDefault();
+  // Create a new row with the values from formData
+ 
+console.log(Add)
+  if (Add.uname==''||Add.uage=='') {
+    console.log('emtea')
+    // Display an error message for an empty name
+    SetEr('Fields cannot be empty');
+  } else if (isNaN(Add.uage)) {
+    // Check if Add.uage is not a number
+    // Display an error message for an invalid age
+    SetEr('Age must be a number');
+  } else {
+    const newRow = {
+      // id: generateUniqueId(), // You need to generate a unique ID for the new row
+      name: Add.uname,
+      age: Add.uage,
+      // Add other fields as needed
+    };
+    SetEr('')
+    setAdd({
+      uname: '',
+      uage: '',
+    });
+    // Add the new row to the table data
+    setData([...Data, newRow]);
+  // Close the modal and reset the form data
+  setModal2(!Modal2);
+  
+
+}
+
+};
+
+const iedit =(index,x)=>{
+  SetInn(index)
+  setModal(!Modal)
+  setEdit({ uname: x.name, uage: x.age, })
+
+}
+
+const idelete = (i)=>{
+  console.log(i)
+  setData(Data.filter((x,k)=>k!==i))
+}
+
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.js</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <div>
+
+      <div className='h-screen  flex flex-col items-center gap-4 justify-center '>
+
+       <button className='px-3 py-1 rounded bg-gray-400 text-xs text-white ' onClick={()=>setModal2(!Modal2)}>ADD</button>
+
+      <table>
+        <thead className='min-w-full bg-gray-400 border border-gray-500 p-6 select-none'>
+          <tr>
+            <th className='px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-500'>ID</th>
+            <th className='px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-500'> NAME</th>
+            <th className='px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-500'>AGE</th>
+            <th className='px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border-r border-gray-500'>ACTIONS</th>
+        </tr>
+      </thead>
+
+      {Data.map((x,index)=>(
+        
+      <tbody className='min-w-full bg-white border border-gray-400 p-6' key={x.id}>
+       
+        <tr>
+          <td className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-400'>{index+1}</td>
+          <td className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-400'>{x.name}</td>
+          <td className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-400'>{x.age}</td>
+          <td className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-400'>
+          <span className='flex flex-row justify-around'>
+            <AiOutlineEdit size={18} className='cursor-pointer' onClick={()=>iedit(index,x)}/>
+            <AiOutlineDelete size={18} className='cursor-pointer' onClick={()=>idelete(index)}/>
+          </span>
+          </td>
+        </tr>
+      </tbody>
+      ))}
+    </table>
+
+  </div>
+
+  {Modal&&
+  <div className='fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center'>
+    <div className='   bg-white rounded-lg text-center p-6 flex flex-col gap-5'>
+
+      <div className='flex flex-col items-start gap-2'>
+        <div className='flex w-full items-end justify-between '>
+          <span className='text-xs font-black text-blue-500'>EDIT</span>
+          <IoCloseSharp size={22} className='text-blue-500  cursor-pointer' onClick={()=>setModal(!Modal)}/>
+        </div>
+
+        <div className='flex flex-col items-start gap-1'>
+          <span className='text-xs font-medium text-gray-500'>Name</span>
+          <input className='border border-gray-500 rounded outline-none p-2' value={Edit.uname}  onChange={echange} name='uname'></input>
         </div>
       </div>
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      <input className='border border-gray-500 rounded outline-none p-2' value={Edit.uage}  onChange={echange} name='uage'></input>
+
+      <button className='flex flex-grow rounded bg-blue-600 justify-center font-normal text-white text-sm p-2' onClick={()=>Editsubmit()}>Save</button>
+
+    </div>
+  </div>}
+
+    {Modal2&&<div className='fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center'>
+      <div className='   bg-white rounded-lg text-center p-6 flex flex-col gap-5'>
+      <form className='flex flex-col gap-5' onSubmit={handleSubmit}>
+        
+        <div className='flex flex-col items-start gap-2'>
+            <div className='flex w-full items-end justify-between '>
+              <span className='text-xs font-black text-blue-500'>ADD</span>
+              <IoCloseSharp size={22} className='text-blue-500  cursor-pointer' onClick={()=>setModal2(!Modal2)}/>
+            </div>
+            <div className='flex flex-col items-start gap-1'>
+              <span className='text-xs font-medium text-gray-500'>Name</span>
+              <input className='border border-gray-500 rounded outline-none p-2' name='uname' value={Add.uname} onChange={achange}></input>
+            </div>
+        </div>
+        <input className='border border-gray-500 rounded outline-none p-2' name='uage' value={Add.uage} onChange={achange}></input>
+        {Er && <span className='flex flex-grow justify-center font-normal text-red-500 text-sm '>{Er}</span>}
+        <button className='flex flex-grow rounded bg-blue-600 justify-center font-normal text-white text-sm p-2' type='submit'>Save</button>
+     
+      </form>
       </div>
+      
+    </div>}
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800 hover:dark:bg-opacity-30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+   </div>
+  );
 }
+
+export default page;
