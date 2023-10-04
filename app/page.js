@@ -9,7 +9,7 @@ const page = () => {
 
 
 const [Modal, setModal] = useState(false);
-const [Modal2, setModal2] = useState(false);
+const [Mode, SetMode] = useState('');
 const [Er ,SetEr] = useState('');
 const [Inn ,SetInn] = useState(-1)
 
@@ -23,11 +23,6 @@ const [Data,setData] = useState ([
   { id:4, name:'hannah',age:5}
 ])
 
-useEffect(() => {
-  console.log(Data)
-  console.log('err',Er)
-  },[Data,Er]
-)
 
 const achange =(e)=>{
   setAdd({
@@ -45,77 +40,53 @@ const echange =(e)=>{
   })
 }
 
-const Editsubmit = ()=>{
-  console.log('hello')
-
-  if (Edit.uname==''||Edit.uage=='') {
-    SetEr('Fields cannot be empty');
-  } 
-  else if (isNaN(Edit.uage)) {
-    SetEr('Age must be a number');
-  } 
-  else{
-    if (Inn !== -1) {
-      const updatedData = [...Data];
-      updatedData[Inn] = {
-        name: Edit.uname,
-        age: Edit.uage,
-      };
-      setData(updatedData);
-  
-      setEdit({uname: '',uage: '',});
-      setModal(!Modal);
-    }
-  }
-}
-
-const handleSubmit= (e) => {
-  
-  e.preventDefault();
-  // Create a new row with the values from formData
- 
-console.log(Add)
-  if (Add.uname==''||Add.uage=='') {
-    console.log('emtea')
-    // Display an error message for an empty name
-    SetEr('Fields cannot be empty');
-  } else if (isNaN(Add.uage)) {
-    // Check if Add.uage is not a number
-    // Display an error message for an invalid age
-    SetEr('Age must be a number');
-  } else {
-    const newRow = {
-      // id: generateUniqueId(), // You need to generate a unique ID for the new row
-      name: Add.uname,
-      age: Add.uage,
-      // Add other fields as needed
-    };
-    SetEr('')
-    setAdd({
-      uname: '',
-      uage: '',
-    });
-    // Add the new row to the table data
-    setData([...Data, newRow]);
-  // Close the modal and reset the form data
-  setModal2(!Modal2);
-  
-
-}
-
-};
-
-const iedit =(index,x)=>{
-  SetInn(index)
-  setModal(!Modal)
-  setEdit({ uname: x.name, uage: x.age, })
-
-}
-
 const idelete = (i)=>{
   console.log(i)
   setData(Data.filter((x,k)=>k!==i))
 }
+
+const iedit =(index,x)=>{
+  SetMode('e') //to make modal dynamic
+  SetInn(index) //to find the index to be edited
+  setModal(!Modal) //open the modal
+  setEdit({ uname: x.name, uage: x.age, })//deafult values of index into the modal
+
+}
+
+const handleSubmit= () => {
+ 
+
+  if (Mode==='e' ? (Edit.uname==''||Edit.uage==''): (Add.uname==''||Add.uage=='')) {
+    SetEr('Fields cannot be empty');
+  } 
+  else if (Mode==='e' ? isNaN(Edit.uage):isNaN(Add.uage)  ) {
+    SetEr('Age must be a number');
+  } 
+  else 
+  {
+    if(Mode==='e')
+    {
+       console.log('editing')
+       if (Inn !== -1) {
+        const updatedData = [...Data];
+        updatedData[Inn] = {name: Edit.uname, age: Edit.uage,};
+        setData(updatedData);
+        setEdit({uname: '',uage: '',});
+        SetEr(''); 
+        
+        }
+    }
+    else
+    {
+      const newRow = { name: Add.uname, age: Add.uage, };
+       setData([...Data, newRow]);
+       SetEr(''); 
+       setAdd({ uname: '', uage: '',});
+      
+    }
+    setModal(!Modal); //In JavaScript, the order of execution is from top to bottom.
+  }
+};
 
 
   return (
@@ -123,7 +94,7 @@ const idelete = (i)=>{
 
       <div className='h-screen  flex flex-col items-center gap-4 justify-center '>
 
-       <button className='px-3 py-1 rounded bg-gray-400 text-xs text-white ' onClick={()=>setModal2(!Modal2)}>ADD</button>
+       <button className='px-3 py-1 rounded bg-gray-400 text-xs text-white ' onClick={()=>{setModal(!Modal);SetMode('')}}>ADD</button>
 
       <table>
         <thead className='min-w-full bg-gray-400 border border-gray-500 p-6 select-none'>
@@ -162,45 +133,24 @@ const idelete = (i)=>{
 
       <div className='flex flex-col items-start gap-2'>
         <div className='flex w-full items-end justify-between '>
-          <span className='text-xs font-black text-blue-500'>EDIT</span>
+          <span className='text-xs font-black text-blue-500'>{Mode==='e'?'EDIT':'ADD'}</span>
           <IoCloseSharp size={22} className='text-blue-500  cursor-pointer' onClick={()=>setModal(!Modal)}/>
         </div>
 
         <div className='flex flex-col items-start gap-1'>
           <span className='text-xs font-medium text-gray-500'>Name</span>
-          <input className='border border-gray-500 rounded outline-none p-2' value={Edit.uname}  onChange={echange} name='uname'></input>
+          <input className='border border-gray-500 rounded outline-none p-2' value={Mode==='e'?Edit.uname:Add.uname}  onChange={Mode==='e'? echange : achange} name='uname'></input>
         </div>
       </div>
 
-      <input className='border border-gray-500 rounded outline-none p-2' value={Edit.uage}  onChange={echange} name='uage'></input>
+      <input className='border border-gray-500 rounded outline-none p-2' value={Mode==='e'?Edit.uage:Add.uage}  onChange={Mode==='e'? echange : achange} name='uage'></input>
 
-      <button className='flex flex-grow rounded bg-blue-600 justify-center font-normal text-white text-sm p-2' onClick={()=>Editsubmit()}>Save</button>
+      {Er && <span className='flex flex-grow justify-center font-normal text-red-500 text-sm '>{Er}</span>}
+
+      <button className='flex flex-grow rounded bg-blue-600 justify-center font-normal text-white text-sm p-2' onClick={handleSubmit}>Save</button>
 
     </div>
   </div>}
-
-    {Modal2&&<div className='fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center'>
-      <div className='   bg-white rounded-lg text-center p-6 flex flex-col gap-5'>
-      <form className='flex flex-col gap-5' onSubmit={handleSubmit}>
-        
-        <div className='flex flex-col items-start gap-2'>
-            <div className='flex w-full items-end justify-between '>
-              <span className='text-xs font-black text-blue-500'>ADD</span>
-              <IoCloseSharp size={22} className='text-blue-500  cursor-pointer' onClick={()=>setModal2(!Modal2)}/>
-            </div>
-            <div className='flex flex-col items-start gap-1'>
-              <span className='text-xs font-medium text-gray-500'>Name</span>
-              <input className='border border-gray-500 rounded outline-none p-2' name='uname' value={Add.uname} onChange={achange}></input>
-            </div>
-        </div>
-        <input className='border border-gray-500 rounded outline-none p-2' name='uage' value={Add.uage} onChange={achange}></input>
-        {Er && <span className='flex flex-grow justify-center font-normal text-red-500 text-sm '>{Er}</span>}
-        <button className='flex flex-grow rounded bg-blue-600 justify-center font-normal text-white text-sm p-2' type='submit'>Save</button>
-     
-      </form>
-      </div>
-      
-    </div>}
 
    </div>
   );
